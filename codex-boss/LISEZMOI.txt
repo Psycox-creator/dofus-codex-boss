@@ -1,0 +1,27 @@
+CODEX DES BOSS 170+ — mise en ligne
+====================================
+
+Le site tient en un seul fichier : index.html. Aucune installation, aucun serveur à configurer.
+
+OPTION 1 — Netlify Drop (le plus rapide, 1 minute, gratuit)
+  1. Va sur https://app.netlify.com/drop
+  2. Glisse le dossier "codex-boss" dans la page.
+  3. Netlify te donne une adresse en ligne. Crée un compte gratuit pour la garder
+     et pour la renommer (ex. codex-boss-aurelien.netlify.app).
+  Mise à jour : glisse à nouveau le dossier sur ton site dans Netlify.
+
+OPTION 2 — GitHub Pages (gratuit, idéal si tu as déjà GitHub)
+  1. Crée un dépôt, par exemple "codex-boss".
+  2. Envoie index.html à la racine (bouton "Add file" > "Upload files").
+  3. Settings > Pages > Source : "Deploy from a branch", branche "main", dossier "/ (root)".
+  4. Ton site sera sur https://TON-PSEUDO.github.io/codex-boss/ après une ou deux minutes.
+
+OPTION 3 — Juste pour toi, sans internet
+  Double-clique sur index.html : il s'ouvre dans ton navigateur et fonctionne hors ligne
+  (seules les polices viennent de Google Fonts ; sans connexion, une police de secours s'affiche).
+
+À SAVOIR
+  - Tes coches de succès sont enregistrées dans le navigateur, propres à chaque adresse :
+    celles du lien claude.ai ne passent pas automatiquement sur ta version hébergée.
+  - Liens directs vers une fiche : ajoute #id à l'adresse, par exemple #givrefoux, #bworker, #top.
+  - Outil non officiel, sans lien avec Ankama. Visuels originaux.

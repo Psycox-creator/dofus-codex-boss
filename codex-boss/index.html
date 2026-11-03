@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Codex perso des boss Dofus 170 à 200 : mécaniques, schémas tactiques et suivi des succès.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Codex des Boss 170+</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Exo+2:ital,wght@0,400;0,600;0,800;1,400&display=swap">
+<style>
+/* Layout : HUD de jeu. Barre d'onglets (Bestiaire / Top team), liste des boss en panneau latéral avec crânes de difficulté, fiche du boss en panneaux HUD à coins biseautés ; empilé sur mobile.
+   Sombre d'abord : nuit de donjon bleu-ardoise, or de butin, rouge sang pour le danger. */
+:root{
+  --bg:#0d1018; --bg2:#121726; --panel:#161c2d; --panel2:#1e2640; --line:#2c3758; --edge:#d9a441;
+  --fg:#eef1fb; --muted:#9ba6c9; --dim:#647099;
+  --gold:#ffc24b; --gold-ink:#1b1305; --blood:#ff4d5e; --mana:#52c8ff; --ok:#5fe08a; --warn:#ffb02e;
+  --glow:0 0 18px color-mix(in srgb,var(--gold) 35%,transparent);
+  --f-display:"Cinzel","Trajan Pro",Georgia,serif;
+  --f-ui:"Exo 2","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#e7e2d6; --bg2:#ddd6c6; --panel:#f6f2e8; --panel2:#ebe4d4; --line:#c6b894; --edge:#9a6a10;
+  --fg:#1a1d2b; --muted:#4f5677; --dim:#7d829c;
+  --gold:#a86d00; --gold-ink:#fff7e6; --blood:#c4182c; --mana:#0b6fa8; --ok:#1d8a45; --warn:#a65e00;
+  --glow:0 0 0 transparent; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#e7e2d6; --bg2:#ddd6c6; --panel:#f6f2e8; --panel2:#ebe4d4; --line:#c6b894; --edge:#9a6a10;
+  --fg:#1a1d2b; --muted:#4f5677; --dim:#7d829c;
+  --gold:#a86d00; --gold-ink:#fff7e6; --blood:#c4182c; --mana:#0b6fa8; --ok:#1d8a45; --warn:#a65e00;
+  --glow:0 0 0 transparent; color-scheme:light}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-ui);font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;
+  background-image:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--mana) 16%,transparent),transparent 60%),repeating-linear-gradient(45deg,transparent 0 22px,color-mix(in srgb,var(--line) 18%,transparent) 22px 23px);background-attachment:fixed}
+.wrap{max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.hud{--cut:12px;clip-path:polygon(var(--cut) 0,calc(100% - var(--cut)) 0,100% var(--cut),100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,var(--cut) 100%,0 calc(100% - var(--cut)),0 var(--cut));background:linear-gradient(180deg,var(--panel2),var(--panel));border:0;position:relative}
+.hud::before{content:"";position:absolute;inset:0;clip-path:inherit;padding:1px;background:linear-gradient(135deg,var(--edge),var(--line) 30%,var(--line) 70%,var(--edge));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:14px 20px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand svg{width:46px;height:46px;flex:none;filter:drop-shadow(var(--glow))}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(1.4rem,3vw,2.1rem);margin:0;letter-spacing:.06em;line-height:1.05;text-transform:uppercase;text-wrap:balance}
+h1 span{color:var(--gold);text-shadow:var(--glow)}
+.tagline{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.team{display:flex;flex-wrap:wrap;gap:8px}
+.hero-pc{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:99px;background:var(--bg2);border:1px solid var(--line);font-weight:600;font-size:.82rem}
+.hero-pc svg{width:24px;height:24px}
+
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:800 .82rem var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:10px 18px;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.tab[aria-selected="true"]{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);box-shadow:var(--glow)}
+.tab:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--mana);outline-offset:2px}
+
+.main{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:920px){.main{grid-template-columns:minmax(0,1fr)}}
+.index{padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+@media (min-width:921px){.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 32px)}}
+input[type=search]{width:100%;font:inherit;color:var(--fg);background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+button.f{font:700 .78rem var(--f-ui);letter-spacing:.06em;color:var(--fg);background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:5px 10px;cursor:pointer}
+button.f[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.xp{display:flex;flex-direction:column;gap:4px}
+.xp .lbl{display:flex;justify-content:space-between;font-size:.76rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.xp .lbl b{color:var(--gold);font-variant-numeric:tabular-nums}
+.xpbar{height:10px;border-radius:2px;background:var(--bg2);border:1px solid var(--line);overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mana),var(--ok));transition:width .3s}
+ul.list{list-style:none;margin:0;padding:0;overflow:auto;display:flex;flex-direction:column;gap:3px;min-height:0}
+ul.list li.grp{font:900 .72rem var(--f-display);letter-spacing:.2em;color:var(--gold);padding:10px 6px 2px;text-transform:uppercase}
+ul.list button.it{width:100%;display:grid;grid-template-columns:36px minmax(0,1fr) auto;grid-template-rows:auto auto;gap:0 8px;align-items:center;text-align:left;background:transparent;border:1px solid transparent;border-radius:4px;padding:6px 8px;color:var(--fg);font:inherit;cursor:pointer}
+ul.list button.it:hover{background:var(--bg2)}
+ul.list button.it.on{background:var(--bg2);border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.lv{grid-row:1/3;font:800 .8rem var(--f-ui);color:var(--gold);text-align:center;border:1px solid var(--line);border-radius:3px;padding:3px 0;font-variant-numeric:tabular-nums}
+.nm{grid-column:2;grid-row:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk{display:flex;gap:1px;grid-column:2;grid-row:2}
+.sk svg{width:13px;height:13px}
+.done{grid-column:3;grid-row:1/3;font:800 .72rem var(--f-ui);color:var(--dim);font-variant-numeric:tabular-nums}
+.done.full{color:var(--ok)}
+.empty{color:var(--muted);padding:8px}
+
+.sheet{display:flex;flex-direction:column;gap:14px;min-width:0}
+.boss{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;padding:18px 22px}
+@media (max-width:560px){.boss{grid-template-columns:minmax(0,1fr)}}
+.crest{width:96px;height:96px;filter:drop-shadow(var(--glow))}
+.boss .meta{display:flex;flex-direction:column;gap:6px;min-width:0}
+.eb{font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.boss h2{font-family:var(--f-display);font-weight:900;font-size:clamp(1.5rem,3.4vw,2.3rem);letter-spacing:.04em;margin:0;line-height:1.05;text-wrap:balance}
+.boss .dj{color:var(--muted);margin:0}
+.rating{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rating span{display:inline-flex;align-items:center;gap:6px}
+.rating svg{width:17px;height:17px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:700;padding:3px 10px 3px 6px;border-radius:3px;background:var(--bg2);border:1px solid var(--line)}
+.chip svg{width:15px;height:15px}
+.chip.v{color:var(--ok)} .chip.p{color:var(--warn)}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+a.btn{display:inline-flex;align-items:center;gap:6px;font:800 .78rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:6px 12px}
+a.btn:hover{background:var(--gold);color:var(--gold-ink)}
+a.btn.alt{color:var(--mana);border-color:var(--mana)}
+a.btn.alt:hover{background:var(--mana);color:var(--bg)}
+
+.alert{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start;padding:14px 18px;background:linear-gradient(90deg,color-mix(in srgb,var(--blood) 20%,var(--panel)),var(--panel));border-left:4px solid var(--blood)}
+.alert svg{width:30px;height:30px;color:var(--blood)}
+.alert h3{margin:0 0 2px;font:800 .78rem var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--blood)}
+.alert p{margin:0}
+.alert b{color:var(--blood)}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:1150px){.grid2{grid-template-columns:minmax(0,1fr)}}
+section.p{padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+section.p h3{display:flex;align-items:center;gap:8px;font:900 .9rem var(--f-display);letter-spacing:.14em;text-transform:uppercase;margin:0;color:var(--gold)}
+section.p h3 svg{width:18px;height:18px}
+section.p ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+section.p li::marker{color:var(--gold)}
+section.p.wide{grid-column:1/-1}
+
+.tactic{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:760px){.tactic{grid-template-columns:minmax(0,1fr)}}
+.board{width:100%;max-width:100%;height:auto;display:block;background:radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--mana) 10%,transparent),transparent 70%);border-radius:6px}
+ol.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+ol.steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;counter-increment:s}
+ol.steps li::before{content:counter(s);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--gold-ink);font-weight:800;font-size:.85rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+.cls{display:flex;flex-direction:column;gap:10px}
+.cl{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start}
+.cl svg{width:32px;height:32px}
+.cl b{display:block;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.succ{display:flex;flex-direction:column;gap:8px}
+.s{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:9px 12px;border-radius:4px;background:var(--bg2);border:1px solid var(--line)}
+.s.all{border-color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.s .t{font-weight:800}
+.s .c{font-size:.88rem;color:var(--muted)}
+.s .sp{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);padding:1px 6px;border-radius:2px;margin-left:6px;vertical-align:2px}
+.chk{display:flex;gap:5px}
+.chk button{width:38px;height:38px;padding:3px;border-radius:50%;border:2px solid var(--line);background:var(--panel);cursor:pointer;opacity:.45;filter:grayscale(1);transition:.15s}
+.chk button svg{width:100%;height:100%}
+.chk button[aria-pressed="true"]{opacity:1;filter:none;border-color:var(--ok);box-shadow:0 0 10px color-mix(in srgb,var(--ok) 50%,transparent)}
+@media (max-width:520px){.s{grid-template-columns:minmax(0,1fr)}}
+.note{font-size:.8rem;color:var(--dim);max-width:90ch;margin:0}
+.note a{color:var(--muted)}
+
+/* Onglet Top team */
+.topgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{padding:16px 18px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;color:var(--fg);font:inherit}
+.card:hover{transform:translateY(-2px)}
+.card .rk{font:900 2rem var(--f-display);color:var(--gold);line-height:1;text-shadow:var(--glow)}
+.card h4{margin:0;font:900 1.15rem var(--f-display);letter-spacing:.04em}
+.card p{margin:0;font-size:.9rem;color:var(--muted)}
+.card .ok{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)}
+.card .later{color:var(--warn)}
+.intro{padding:16px 20px}
+.intro p{margin:0;max-width:85ch;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top hud">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 2l18 7v13c0 12-8 20-18 24C14 42 6 34 6 22V9z" fill="var(--panel2)" stroke="var(--gold)" stroke-width="2"/><path d="M24 12c-6 0-9 4-9 9 0 3 2 5 3 6v4h12v-4c1-1 3-3 3-6 0-5-3-9-9-9z" fill="var(--gold)"/><circle cx="20" cy="21" r="2.4" fill="var(--panel2)"/><circle cx="28" cy="21" r="2.4" fill="var(--panel2)"/><path d="M21 31v3M24 31v3M27 31v3" stroke="var(--panel2)" stroke-width="1.6"/></svg>
+      <div><h1>Codex des <span>Boss 170+</span></h1><p class="tagline">42 donjons, leurs pièges et leurs succès, pensés pour ta team.</p></div>
+    </div>
+    <div class="team" id="team"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Vues">
+    <button class="tab" role="tab" id="tBest" aria-selected="true" data-v="best">Bestiaire</button>
+    <button class="tab" role="tab" id="tTop" aria-selected="false" data-v="top">Top pour ma team</button>
+  </nav>
+
+  <div id="vBest" class="main">
+    <aside class="index hud" aria-label="Donjons">
+      <input type="search" id="q" placeholder="Chercher un boss ou un donjon…" aria-label="Chercher">
+      <div class="row" id="bands" role="group" aria-label="Filtrer par niveau"></div>
+      <div class="row" role="group" aria-label="Trier">
+        <button class="f" data-sort="lvl" aria-pressed="true">Par niveau</button>
+        <button class="f" data-sort="diff" aria-pressed="false">Par difficulté</button>
+      </div>
+      <div class="xp"><div class="lbl"><span>Progression succès</span><b><span id="pDone">0</span> / <span id="pAll">0</span></b></div><div class="xpbar"><i id="pBar"></i></div></div>
+      <ul class="list" id="list"></ul>
+    </aside>
+    <main class="sheet" id="sheet"></main>
+  </div>
+
+  <div id="vTop" hidden>
+    <div class="intro hud"><p>Classement des donjons les plus confortables pour une team Sadida, Forgelance, Pandawa, Crâ. Il favorise les combats où le placement du Pandawa et le contrôle du Crâ règlent la mécanique principale, et où le Sadida peut couper les lignes de vue. Ce classement est une estimation de ma part, à ajuster avec tes propres runs. Clique sur une carte pour ouvrir la fiche.</p></div>
+    <div class="topgrid" id="topgrid"></div>
+  </div>
+
+  <p class="note">Sources : guides de donjon de <a href="https://dofus.jeuxonline.info/donjons" target="_blank" rel="noopener">JeuxOnLine</a>, succès spéciaux de donjon listés par <a href="https://www.gamosaurus.com/jeux/dofus/dofus-2-68-tous-les-nouveaux-succes-de-donjon" target="_blank" rel="noopener">Gamosaurus</a>, liste des donjons Dofus 3 de Superpouvoir. Les crânes de difficulté et les étoiles « team » sont mes estimations. Les schémas tactiques sont des illustrations de la mécanique, pas la carte exacte du combat. En cas de doute, le jeu a raison. Tes coches restent dans ce navigateur. Outil non officiel, sans lien avec Ankama ; visuels originaux.</p>
+</div>
+
+<script>
+const JOL="https://dofus.jeuxonline.info/article/";
+const D=[
+{id:"koumiho",b:"Koumiho",lvl:170,dj:"Demeure des Esprits",pos:"[39,-44] · Île de Grobe",v:true,url:JOL+"14909",
+ key:"Koumiho est invulnérable tant que ses deux Kitsounebis n'ont pas été tués <b>dans le même tour</b>. Dès le tour 2 ils deviennent invisibles.",
+ mech:["Rendre les Kitsounebis visibles : la <b>Lanterne des Spiritueurs</b> les révèle dans sa zone.","Marcher sur un glyphe de Kitsounebi échange Koumiho avec le Kitsounebi lié : utile pour les localiser.","Si un seul Kitsounebi meurt, Koumiho le réinvoque au tour suivant.","Une fois vulnérable, Koumiho se rend invisible et pacifiste un tour, puis tous les 6 tours (Retraite) : soin, bouclier, +250 Puissance.","Les monstres du Mont des Tombeaux gagnent un bonus s'ils voient un joueur au début de leur tour (dès le tour 2) : casse les lignes de vue."],
+ mobs:["<b>Kaonashi</b> : ne tue pas son invocation, sinon il frappe à 75 % des PV au contact.","<b>Madura</b> : partage la moitié de ses dégâts avec un allié, à tuer en premier.","<b>Bakazako</b> : se clone et partage ses dégâts, retire des PA.","<b>Onigori</b> : rend Insoignable et Indéplaçable en diagonale."],
+ succ:[["Vaincre Koumiho","Terminer le donjon."],["Focus","Ne frapper qu'une cible jusqu'à sa mort (attention au partage du Madura)."],["Premier","Koumiho doit mourir en premier."],["Duo","2 personnages max, 20 tours."],["Lanterne interdite","Ne pas utiliser le sort « Lanterne des Spiritueurs ».",1]],
+ team:{SA:"Arbre et poupées pour couper les lignes de vue des Yokai. Ta poupée de soin compense les dégâts de zone de Koumiho.",FO:"Tu nettoies : Madura d'abord, puis Bakazako. Garde ton burst pour le tour où Koumiho tombe vulnérable.",PA:"Porte un allié sur les glyphes de Kitsounebi pour révéler les positions sans gaspiller de PM.",CR:"Une fois les deux Kitsounebis repérés, c'est toi qui les achèves à distance dans le même tour."}},
+{id:"pere-ver",b:"Père Ver",lvl:170,dj:"Boyau du Père Ver",pos:"Gorges des Vents Hurlants · Saharach",v:true,url:JOL+"14055",
+ key:"Le Père Ver est immobile et <b>ne subit aucun dégât à 2 PO ou plus</b> : il faut aller au corps à corps.",
+ mech:["Chaque monstre tué fait perdre à toute ta team 1 PA, 1 PM, ~500 PV et donne 50 % d'érosion pendant un tour.","Chaque monstre tué retire aussi 10 % de résistances au Père Ver.","Paternalisme : il partage les dégâts reçus par un allié et le soigne de 10 %.","Bien vu l'Aveugle : ses alliés gagnent 2 PA, 2 PM, 200 Puissance."],
+ mobs:["<b>Pikténia</b> : renvoie 30 % des dégâts reçus sur tes persos.","<b>Cycloporth</b> : attire de 8 cases, révèle les invisibles, retire des PA.","<b>Masticroc</b> : s'enterre invulnérable puis ressort avec +7 PA.","<b>Trémorse</b> : −300 Puissance et empêche l'arme."],
+ succ:[["Vaincre le Père Ver","Terminer le donjon."],["Premier","Le Père Ver doit mourir en premier."],["Zombie","Utiliser tous ses PM à chaque tour (1 PM max par tour hors bonus)."],["Duo","2 personnages max, 15 tours."],["Diagonale","Chaque combattant termine son tour en diagonale d'un ennemi.",1]],
+ team:{SA:"Reste en retrait, soigne et bloque les lignes de vue des vers à distance.",FO:"Ton rôle principal : c'est toi qui tapes le Père Ver au contact.",PA:"Lance le Forgelance directement au contact du boss au tour 1, puis tank avec lui.",CR:"Inutile sur le boss. Contrôle les vers (retrait PM, recul) sans les tuer trop tôt si tu vises « Premier »."}},
+{id:"givrefoux",b:"Tengu & Fuji Givrefoux",lvl:170,dj:"Tanière Givrefoux",pos:"[-80,-75] · Frigost",v:true,url:JOL+"14648",
+ key:"Le Tengu est invulnérable. Dans le même tour : <b>Yokaï en diagonale</b> du Tengu, <b>Yomi aligné</b> avec lui, puis un <b>coup d'arme sur le Yomi</b>. Il perd l'état pour 3 tours.",
+ mech:["Ne tue ni le Yokaï ni le Yomi avant le Tengu.","Si tu actives le Yomi sans le Yokaï, le Tengu <b>tue deux persos</b> au contact. Dans le doute, attends le tour suivant.","La Fuji n'est pas invulnérable mais tue au contact (Progéniture) et frappe en diagonale à 3-4 PO.","Combat Fuji : chaque monstre tué donne +1 PM aux autres et +1000 dommages aux boss pour un tour."],
+ mobs:["<b>Yomi</b> : retire 10 PM non esquivables au contact.","<b>Kami</b> : ne reste pas en diagonale.","<b>Maho</b> : reste à plus de 3 cases.","<b>Soryo</b> : 1 chance sur 2 de se soigner quand on le frappe."],
+ succ:[["Vaincre Tengu et Fuji","Terminer le donjon."],["Premier (Tengu)","Le Tengu meurt en premier."],["Dernier (Fuji)","La Fuji meurt en dernier."],["Statue","Terminer son tour sur sa case de départ."],["Duo Tengu / Duo Fuji","15 tours / 21 tours, 2 persos max."],["Éparpillés (Tengu)","Finir son tour à plus de 4 PO de tous les alliés.",1],["Hors ligne (Fuji)","Ne jamais finir en ligne d'un ennemi.",1]],
+ team:{SA:"Sécurise la zone avec l'Arbre pour casser les diagonales de la Fuji.",FO:"Le coup d'arme sur le Yomi, c'est toi : garde ton arme équipée et finis le Tengu pendant ses 3 tours.",PA:"Le donjon parfait pour toi : porte et lance le Yokaï en diagonale du Tengu.",CR:"Recul pour aligner le Yomi avec le Tengu. Repousse la Fuji hors de portée."}},
+{id:"xlii",b:"XLII",lvl:170,dj:"Horologium de XLII",pos:"[7,-2] · Xélorium (clé obligatoire)",v:true,url:JOL+"14663",
+ key:"Combat en <b>5 vagues</b>, une tous les 5 tours. L'Auroraire fait passer tes dégâts de 40 % à plus de 100 % au fil des tours, pour les monstres aussi.",
+ mech:["Le trousseau ne marche pas : il faut crafter la clé, et la TP est impossible en dimension.","Les monstres d'une nouvelle vague sont invulnérables jusqu'à leur premier tour.","Le nombre de monstres par vague est fixé au départ : un mort ne réduit pas les vagues suivantes.","XLII meurt : l'Auroraire et ses bonus disparaissent.","Déplacer XLII lui permet d'échanger de place avec un Hordémon."],
+ mobs:["Tous les Hordémons changent de passif sous 50 % de PV.","<b>Trezz</b> sous 50 % : gagne de la Puissance à chaque coup, à achever vite.","<b>Vindeux</b> sous 50 % : renvoie les dégâts autour de l'attaquant.","<b>Seith</b> au-dessus de 50 % : attire celui qui le frappe."],
+ succ:[["Vaincre XLII","Terminer le donjon."],["Barbare","Chaque perso inflige des dégâts avec son arme à chaque tour."],["Collant","Finir son tour au contact d'un allié."],["Duo","2 personnages max, 80 tours."],["Vague par vague","Tous les ennemis meurent avant la vague suivante.",1]],
+ team:{SA:"Les premiers tours sont faibles en dégâts : boosts, poupées et réduction de résistances.",FO:"Focus XLII avant qu'il ne te rende Pacifiste au contact.",PA:"Ne déplace pas XLII, sinon il s'échange. Porte plutôt les Hordémons loin de la team.",CR:"Temporise la vague 1 avec retraits PM et reculs pendant que le Forgelance tue XLII."}},
+{id:"bworker",b:"Bworker",lvl:180,dj:"Grotte du Bworker",pos:"[-15,14] · Gisgoul",v:true,url:JOL+"13853",
+ key:"Pas d'invulnérabilité : le danger est son <b>corps à corps</b>, qui frappe à 30 % de ses PV (ou de ses PV manquants). Ne le laisse jamais te coller.",
+ mech:["Fauchoir : repousse de 2 cases après le coup.","La Mama Bwork rend tous ses PV à un allié (puis Insoignable 3 tours) : tue-la en premier.","Les Cybworks interceptent les dégâts de leurs alliés dans un cercle de 2 cases."],
+ mobs:["<b>Bworks élémentaires</b> : +50 % de vitalité en buff, invoquent des flammèches qui bloquent tes lignes de vue.","<b>Bwork d'Eau</b> : Insoignable, Pesanteur et −2 PM jusqu'à 15 PO."],
+ succ:[["Vaincre le Bworker","Terminer le donjon."],["Hardi","Finir son tour au contact d'un ennemi."],["Blitzkrieg","Un ennemi attaqué doit mourir avant son prochain tour."],["Duo","2 personnages max, 15 tours."],["Zéro entrave","Ne jamais déplacer ni retirer PA, PM ou PO.",1]],
+ team:{SA:"Tu protèges : bouclier et soin sur celui que le Bworker vise.",FO:"Mama Bwork d'abord, puis tu frappes le Bworker et tu sors de son contact.",PA:"Porte le Bworker loin de la team. Interdit pour le succès spécial, garde ça pour les runs normaux.",CR:"Flèche de recul et retrait PM pour garder le Bworker à distance (hors succès spécial)."}},
+{id:"korriandre",b:"Korriandre",lvl:180,dj:"Antre du Korriandre",pos:"[-73,-69] · Frigost II",url:JOL+"14647",
+ sp:"Les combattants doivent finir leur tour à plus de 3 PO d'un allié.",
+ team:{SA:"Le succès spécial écarte la team : place une poupée de soin à mi-chemin entre deux persos.",FO:"Tu joues seul au front : garde une sortie de mobilité pour ne pas finir collé à un allié.",PA:"Porter un allié puis le lancer règle le placement en fin de tour.",CR:"Reste en fond de map, c'est naturel pour toi avec ce succès."}},
+{id:"kralamoure",b:"Kralamoure Géant",lvl:180,dj:"Antre du Kralamoure Géant",pos:"[-60,-8] · Otomaï (4 salles à activer)",v:true,url:JOL+"13868",
+ key:"Le Kralamoure a <b>900 % de résistances</b>. Tous les tentacules doivent lancer leur sort l'un après l'autre <b>dans le même tour</b> pour qu'il lance « Vulnérabilité de la Tourbière ».",
+ mech:["Ouverture : quatre salles à activer en même temps en [-49,9], [-56,4], [-55,11], [-52,15].","Une fois vulnérable, lui et ses alliés gagnent 2 PM, 63 PO et 8000 dommages fixes pendant 2 tours : protège-toi avant de frapper.","Le placement des tentacules et les lignes de vue décident tout."],
+ succ:[["Vaincre le Kralamoure","Terminer le donjon."],["Duo","2 personnages max."],["Pas d'alignement allié","Ne jamais terminer en ligne d'un allié.",1]],
+ team:{SA:"Une ronce ou un Arbre peut figer un tentacule à sa place pour la séquence.",FO:"Burst maximal pendant les 2 tours de vulnérabilité, puis tu te mets à l'abri.",PA:"La pièce maîtresse : JOL recommande explicitement le Pandawa pour placer les tentacules.",CR:"Recul pour ajuster les tentacules mal placés, puis gros dégâts depuis une case hors de sa ligne de vue (ses 63 PO couvrent toute la map)."}},
+{id:"ougah",b:"Ougah",lvl:180,dj:"Temple du Grand Ougah",pos:"[-9,29] · Sidimote",url:JOL+"13855",
+ sp:"Ne pas terminer son tour en ligne ou en diagonale d'un ennemi.",
+ team:{SA:"L'Arbre te sert de cachette : derrière lui, tu n'es plus en ligne.",FO:"Frappe puis replace-toi hors des lignes et diagonales : garde des PM.",PA:"Repositionne les alliés en fin de tour en les portant et lançant.",CR:"Reculer un monstre peut te sortir de sa ligne : vérifie avant de finir ton tour."}},
+{id:"fwetard",b:"Père Fwetard",lvl:180,dj:"Maison du Papa Nowel",pos:"[-34,-39] · Île de Nowel (période de Nowel)",url:JOL+"13895",
+ sp:"Pas de succès spécial connu (donjon saisonnier).",
+ team:{SA:"Accessible seulement pendant l'événement de Nowel, de mi-décembre à fin janvier.",FO:"Rôle de DPS principal.",PA:"Placement et tank.",CR:"Contrôle à distance."}},
+{id:"toxoliath",b:"Toxoliath",lvl:180,dj:"Cave du Toxoliath",pos:"[8,8] · Srambad (clé obligatoire)",url:JOL+"14679",
+ key:"Donjon à <b>vagues</b> rempli de poisons qui frappent selon les PA ou PM que tu utilises. Frapper le Toxoliath déclenche son sort le plus dangereux sur toi.",
+ sp:"Toxoliath doit mourir en dernier. Second succès : ne jamais finir son tour au contact d'un allié.",
+ team:{SA:"Soin et désenvoûtement : les poisons sont la vraie menace.",FO:"Nettoie les vagues ; le boss passe en dernier pour le succès.",PA:"Écarte les alliés en fin de tour (succès Misanthrope).",CR:"Tue les Nécrotiques à distance sans consommer trop de PM."}},
+{id:"razof",b:"Comte Razof",lvl:190,dj:"Camp du Comte Razof",pos:"[-68,30] · Nimotopia",url:JOL+"14652",
+ sp:"Aucune invocation alliée ne doit être achevée par un ennemi.",
+ team:{SA:"Le succès vise toi : tes poupées ne doivent pas mourir sous les coups ennemis. Pose-les hors de portée ou réinvoque-les toi-même.",FO:"Protège les poupées en éliminant ce qui les cible.",PA:"Porte une poupée en danger pour la sortir d'une zone.",CR:"Repousse les monstres qui foncent sur les invocations."}},
+{id:"glourseleste",b:"Glourséleste",lvl:190,dj:"Antichambre des Gloursons",pos:"[-52,-44] · Frigost II",url:JOL+"14650",
+ sp:"Ne jamais subir de dommages de poussée.",
+ team:{SA:"Ne place pas tes persos contre un obstacle ou un allié.",FO:"Garde de l'espace derrière toi quand tu engages.",PA:"Attention aux lancers : jeter un allié contre un obstacle peut lui infliger de la poussée.",CR:"Tes reculs sur les monstres ne comptent pas, seule la poussée que subissent tes persos compte."}},
+{id:"grolloum",b:"Grolloum",lvl:190,dj:"Mine de Sakaï",pos:"[-63,-75] · Île de Sakaï",url:JOL+"13897",
+ sp:"Ne pas déplacer les ennemis sous l'état Zombi.",
+ team:{SA:"Repère l'état Zombi sur les monstres avant chaque action.",FO:"Évite tes sorts qui attirent ou repoussent sur les cibles Zombi.",PA:"Ne porte pas un ennemi Zombi. Tes déplacements alliés restent libres.",CR:"Vérifie l'état avant chaque flèche de recul."}},
+{id:"kolosso",b:"Kolosso",lvl:190,dj:"Cavernes du Kolosso",pos:"[-61,-69] · Frigost II",url:JOL+"14649",
+ sp:"Les alliés ne doivent jamais recevoir de soin.",
+ team:{SA:"Ta poupée de soin reste rangée : joue plutôt bouclier et contrôle.",FO:"Sans soin, évite les échanges au contact prolongés.",PA:"Coupe tes soins passifs ou sorts qui soignent.",CR:"Joue loin et retire des PM : aucun dégât subi ne sera rendu."}},
+{id:"ombre",b:"Ombre",lvl:190,dj:"Pyramide d'Ombre",pos:"[6,13] · Dimension Obscure",url:JOL+"14653",
+ sp:"Ombre doit être achevé au contact de la Silhouette et du Globilum.",
+ team:{SA:"Garde un œil sur les PV d'Ombre pour ne pas l'achever trop tôt.",FO:"Le coup final sera souvent le tien : tu dois l'achever au bon endroit.",PA:"Porte et lance Ombre entre la Silhouette et le Globilum.",CR:"Recul pour coller Ombre aux deux autres avant le finish."}},
+{id:"kao",b:"Prêtresse de Kao",lvl:190,dj:"Temple du Dieu Kao",pos:"[-1,-10] · Île de Pwâk (événement)",url:JOL+"14724",
+ sp:"Pas de succès spécial connu (donjon d'événement Pwâk).",
+ team:{SA:"Donjon disponible pendant l'événement de l'Île de Pwâk.",FO:"DPS principal.",PA:"Placement.",CR:"Contrôle à distance."}},
+{id:"anerice",b:"Anerice la Shushess",lvl:200,dj:"Manoir des Katrepat",pos:"[-14,25] · Sidimote",url:JOL+"14646",
+ sp:"Chaque combattant doit être goulifié au moins une fois.",
+ team:{SA:"Tes poupées ne sont pas des combattants : seuls tes 4 persos comptent.",FO:"Expose-toi volontairement à la goulification une fois.",PA:"Porte l'allié qui n'a pas encore été goulifié vers la menace.",CR:"Le Crâ reste souvent loin : rapproche-le une fois pour valider."}},
+{id:"bethel",b:"Bethel Akarna",lvl:200,dj:"Tour de Bethel",pos:"[-48,-82] · Frigost",url:JOL+"14654",
+ sp:"Aucun ennemi ne doit entrer dans l'état Necronyx avant la mort de Bethel.",
+ team:{SA:"Concentre les soins pour tenir le rush sur Bethel.",FO:"Focus total sur Bethel.",PA:"Isole Bethel des autres monstres.",CR:"Retire des PM aux monstres pour qu'ils ne gênent pas le rush."}},
+{id:"meno",b:"Capitaine Méno",lvl:200,dj:"Vaisseau du Capitaine Méno",pos:"[24,27] · Sufokia",url:JOL+"14645",
+ sp:"Les combattants doivent terminer leur tour en ligne d'un combattant.",
+ team:{SA:"Une poupée bien placée peut servir de point d'alignement.",FO:"Finis en ligne d'un ennemi ou d'un allié : les deux comptent.",PA:"Facile à aligner : porte-lance un allié dans la bonne ligne.",CR:"Aligné avec ta cible, c'est ta position naturelle de tir."}},
+{id:"chaloeil",b:"Chaloeil",lvl:200,dj:"Défi du Chaloeil",pos:"[-9,-22] · Écaflipus",url:JOL+"14674",
+ sp:"Finir chaque tour sur une case du même numéro et de la même couleur que sa case de départ.",
+ team:{SA:"Note ta case de départ avant le tour 1.",FO:"Calcule ton retour avant d'engager.",PA:"Porter un allié et le lancer sur la bonne case règle les mauvais tours.",CR:"Joue depuis une case conforme et bouge peu."}},
+{id:"harebourg",b:"Comte Harebourg",lvl:200,dj:"Tour de la Clepsydre",pos:"[-66,-79] · Château du Comte, Frigost III",url:JOL+"13413",
+ sp:"Ne pas occasionner de dégâts au corps à corps.",
+ team:{SA:"Dégâts à distance uniquement : tes sorts conviennent.",FO:"Le succès spécial est dur pour toi : utilise uniquement tes attaques à 2 PO et plus.",PA:"Pas de coups au contact : placement et soutien.",CR:"Ton donjon : tu portes les dégâts."}},
+{id:"corruption",b:"Corruption",lvl:200,dj:"Arbre de mort",pos:"[10,19] puis portail du royaume corrompu",url:JOL+"14863",
+ sp:"Seuls les alliés sans maladie peuvent occasionner des dégâts.",
+ team:{SA:"Retire ou évite les maladies sur tes DPS.",FO:"Vérifie ton état avant chaque attaque.",PA:"Écarte les porteurs de maladie.",CR:"Reste loin des sources de maladie pour rester ton DPS fiable."}},
+{id:"dantinea",b:"Dantinéa",lvl:200,dj:"Palais de Dantinéa",pos:"[19,26] · Sufokia",url:JOL+"14658",
+ sp:"Un coquillage ne peut subir de dommages que du combattant auquel il est lié.",
+ team:{SA:"Attention aux zones de tes sorts qui touchent les coquillages des autres.",FO:"Ne frappe que ton coquillage.",PA:"Approche chaque perso de son propre coquillage.",CR:"Évite la Flèche de dispersion et les zones près des coquillages."}},
+{id:"dazak",b:"Dazak Martegel",lvl:200,dj:"Brasserie du Roi Dazak",pos:"[-62,-70] · Frigost",url:JOL+"14609",
+ sp:"Les ennemis ne doivent pas atteindre la Nimpatience III.",
+ team:{SA:"Gère le rythme : la Nimpatience monte avec le temps.",FO:"Tue vite ce qui monte en Nimpatience.",PA:"Placement rapide pour accélérer les kills.",CR:"Priorise les monstres proches du palier III."}},
+{id:"guerre",b:"Guerre",lvl:200,dj:"Trône de sang",pos:"[4,-2] · Blessure de Guerre",url:JOL+"14862",
+ sp:"Aucune arme de Guerre ne doit être achevée ou déplacée par un allié.",
+ team:{SA:"Attention aux zones qui achèvent une arme par accident.",FO:"Cible Guerre, ignore ses armes.",PA:"Ne porte pas les armes.",CR:"Pas de recul sur les armes."}},
+{id:"ilyzaelle",b:"Ilyzaelle",lvl:200,dj:"Belvédère d'Ilyzaelle",pos:"[-61,-79] · Château du Comte",url:JOL+"14668",
+ sp:"Ilyzaelle doit être vaincue avant la troisième vague.",
+ team:{SA:"Boosts et réduction de résistances dès le tour 1.",FO:"Rush Ilyzaelle.",PA:"Amène Ilyzaelle au contact du Forgelance.",CR:"Focus Ilyzaelle à distance."}},
+{id:"klime",b:"Klime",lvl:200,dj:"Salons Privés de Klime",pos:"[-63,-86] · Château du Comte",url:JOL+"14656",
+ sp:"Aucun allié ne doit entrer dans l'état Pacifiste.",
+ team:{SA:"Repère ce qui applique Pacifiste et garde tes persos hors de portée.",FO:"Tu es le plus exposé au contact : surveille Pacifiste.",PA:"Sors les alliés menacés.",CR:"Retire des PM à la source de Pacifiste."}},
+{id:"koutoulou",b:"Larve de Koutoulou",lvl:200,dj:"Temple de Koutoulou",pos:"[27,26] · Sufokia",url:JOL+"14667",
+ sp:"Entre chacun de ses tours, un ennemi doit échanger de place avec un allié au moins une fois.",
+ team:{SA:"Repère qui dispose d'un sort de transposition.",FO:"Si tu as un échange de place, réserve-le à ça.",PA:"Ta mécanique de portage aide au placement autour des échanges.",CR:"Contrôle le reste pendant que l'échange se fait."}},
+{id:"merkator",b:"Merkator",lvl:200,dj:"Aquadôme de Merkator",pos:"[21,18] · Sufokia",url:JOL+"14178",
+ sp:"Chaque combattant doit commencer ou terminer son tour en ligne d'un ennemi.",
+ team:{SA:"En ligne d'un ennemi au début ou à la fin : choisis le moment le plus sûr.",FO:"Finis aligné avec ta cible.",PA:"Ajuste les alignements en portant.",CR:"Naturel pour toi."}},
+{id:"misere",b:"Misère",lvl:200,dj:"Sentence de la balance",pos:"[1,0] · Désert de Misère",url:JOL+"14864",
+ sp:"Misère doit mourir en première et être dans l'état Collecte à chaque tour.",
+ team:{SA:"Tiens la team pendant le rush.",FO:"Focus Misère.",PA:"Isole Misère du reste.",CR:"Focus Misère à distance."}},
+{id:"frizz",b:"Missiz Frizz",lvl:200,dj:"Forgefroide de Missiz Frizz",pos:"[-70,-81] · Château du Comte",url:JOL+"14657",
+ sp:"À chaque tour, un seul ennemi peut être attiré ou poussé.",
+ team:{SA:"Coordonne-toi : un seul déplacement d'ennemi par tour pour toute la team.",FO:"Annonce si ton tour déplace un ennemi.",PA:"Ton portage d'ennemi compte : choisis le bon tour.",CR:"Un seul recul par tour, pour toute l'équipe."}},
+{id:"nileza",b:"Nileza",lvl:200,dj:"Laboratoire de Nileza",pos:"[-61,-74] · Château du Comte",url:JOL+"12154",
+ sp:"Aucun allié ne doit entrer dans l'état Pacifiste.",
+ team:{SA:"Surveille ce qui applique Pacifiste.",FO:"Tu es exposé au front.",PA:"Sors les alliés en danger.",CR:"Contrôle à distance."}},
+{id:"protozorreur",b:"Protozorreur",lvl:200,dj:"Ventre de la Baleine",pos:"[-85,-59] · Roc des Salbatroces",url:JOL+"14644",
+ sp:"La Malamibe doit toujours être achevée avant son prochain tour.",
+ team:{SA:"Garde des dégâts de réserve à chaque tour.",FO:"Tu achèves la Malamibe dès qu'elle apparaît.",PA:"Approche la Malamibe du Forgelance.",CR:"Tu peux l'achever de loin."}},
+{id:"amirukam",b:"Reine Amirukam",lvl:200,dj:"Souvenir d'Imagiro",pos:"[2,0] · Royaume de papier",url:JOL+"14924",
+ sp:"L'invocation Roi Imagami doit mourir des mains des alliés avant sa phase Lotus.",
+ team:{SA:"Réduction de résistances sur l'invocation.",FO:"Burst sur le Roi Imagami.",PA:"Approche l'invocation.",CR:"Focus l'invocation."}},
+{id:"reine-voleurs",b:"Reine des Voleurs",lvl:200,dj:"Trône de la Cour Sombre",pos:"[8,-4] · Srambad",url:JOL+"13560",
+ sp:"Les alliés ne doivent pas être soignés par les Bonbombes bleues.",
+ team:{SA:"Éloigne les persos blessés des Bonbombes bleues.",FO:"Ne passe pas dans leur zone.",PA:"Écarte les Bonbombes bleues.",CR:"Repousse les Bonbombes bleues loin de la team."}},
+{id:"imagami",b:"Roi Imagami",lvl:200,dj:"Mémoire d'Orukam",pos:"[-3,-1] · Royaume d'encre",url:JOL+"14925",
+ sp:"L'invocation Reine Amirukam doit mourir des mains des alliés avant sa phase Lotus.",
+ team:{SA:"Réduction de résistances sur l'invocation.",FO:"Burst sur la Reine Amirukam.",PA:"Approche l'invocation.",CR:"Focus l'invocation."}},
+{id:"nidas",b:"Roi Nidas",lvl:200,dj:"Palais du Roi Nidas",pos:"[-5,-5] · Énutrosor",url:JOL+"13559",
+ sp:"Il faut être en ligne ou en diagonale de la cible pour lui infliger des dégâts.",
+ team:{SA:"Vérifie l'alignement de chaque sort.",FO:"Attaque en ligne ou en diagonale.",PA:"Place les alliés sur les axes.",CR:"Tirs alignés."}},
+{id:"servitude",b:"Servitude",lvl:200,dj:"Fers de la Tyrannie",pos:"[10,-19] puis portail de la galère",url:JOL+"14865",
+ sp:"Ne pas tuer les Armécréantes.",
+ team:{SA:"Évite les zones sur les Armécréantes.",FO:"Cible uniquement le reste.",PA:"Écarte les Armécréantes.",CR:"Pas de dispersion près d'elles."}},
+{id:"solar",b:"Solar",lvl:200,dj:"Tour de Solar",pos:"[-31,15] · Sidimote",url:JOL+"14286",
+ sp:"Aucun ennemi ne doit entrer dans l'état Necronyx avant la mort de Solar.",
+ team:{SA:"Tiens la team pendant le rush.",FO:"Focus Solar.",PA:"Isole Solar.",CR:"Contrôle le reste."}},
+{id:"sylargh",b:"Sylargh",lvl:200,dj:"Transporteur de Sylargh",pos:"[-53,-84] · Château du Comte",url:JOL+"14651",
+ sp:"Les Zombis ne doivent jamais occasionner de dégâts.",
+ team:{SA:"Bloque les Zombis avec l'Arbre et tes poupées.",FO:"Évite le contact des Zombis.",PA:"Écarte les Zombis de la team.",CR:"Retire des PM aux Zombis à chaque tour."}},
+{id:"talkasha",b:"Tal Kasha",lvl:200,dj:"Chambre de Tal Kasha",pos:"[12,-77] · Pyramide Maudite, Saharach",v:true,url:JOL+"14675",
+ key:"Tal Kasha est invulnérable et <b>frappe à travers ses alliés</b> : chaque monstre est un relais. Si deux persos sont exposés, le plus proche du relais est ciblé.",
+ mech:["Accès : sépare la team en deux groupes de deux pour activer deux salles en [8,-78] et [4,-72] avant d'ouvrir la porte en [11,-74].","Les relais ne bougent pas pendant le tour du boss : lis son tour à partir de leur position.","Un état sur les monstres se retire avec des dommages de poussée."],
+ succ:[["Vaincre Tal Kasha","Terminer le donjon."],["Statue","Finir son tour sur sa case de départ."],["Focus","Ne frapper qu'une cible jusqu'à sa mort."],["Duo","2 personnages max, 40 tours."],["Résurrection unique","Un ennemi ressuscité ne doit pas l'être une seconde fois.",1]],
+ team:{SA:"L'accès en deux groupes : pars avec le Crâ, laisse le Panda avec le Forgelance.",FO:"Garde de la distance avec chaque monstre : chacun est une bouche de Tal Kasha.",PA:"Dommages de poussée garantis en lançant un monstre contre un obstacle : c'est ce qui retire leur état.",CR:"Flèche de recul contre un mur pour la poussée, et reste loin des relais."}},
+{id:"vortex",b:"Vortex",lvl:200,dj:"Œil de Vortex",pos:"[1,1] · Xélorium",url:JOL+"13603",
+ sp:"Tous les ennemis doivent être achevés à la même heure.",
+ team:{SA:"Équilibre les PV des ennemis avec tes zones.",FO:"Garde ton burst pour l'heure du finish.",PA:"Regroupe les ennemis pour le finish.",CR:"Tes zones achèvent plusieurs cibles en même temps."}}
+];
+
+/* Difficulté générale (crânes, 1-5) et confort pour la team (étoiles, 1-5), estimations */
+const RATE={koumiho:[3,4],"pere-ver":[2,5],givrefoux:[4,4],xlii:[3,3],bworker:[2,5],korriandre:[3,3],kralamoure:[4,4],ougah:[3,3],fwetard:[2,4],toxoliath:[3,3],
+ razof:[2,4],glourseleste:[4,2],grolloum:[3,3],kolosso:[4,2],ombre:[3,4],kao:[2,4],anerice:[3,3],bethel:[4,3],meno:[4,3],chaloeil:[4,2],harebourg:[5,2],corruption:[5,2],
+ dantinea:[4,3],dazak:[4,3],guerre:[5,2],ilyzaelle:[4,3],klime:[4,3],koutoulou:[5,2],merkator:[4,3],misere:[5,2],frizz:[4,3],nileza:[4,3],protozorreur:[4,3],amirukam:[5,2],
+ "reine-voleurs":[3,4],imagami:[5,2],nidas:[4,3],servitude:[5,2],solar:[4,3],sylargh:[4,3],talkasha:[4,3],vortex:[5,2]};
+const WHY={bworker:"Aucune invulnérabilité. Le Crâ et le Pandawa gardent le Bworker loin de la team, le Sadida protège.",
+ "pere-ver":"Mécanique simple : le Pandawa lance le Forgelance au contact du boss dès le tour 1.",
+ koumiho:"Le Sadida coupe les lignes de vue des Yokai, le Crâ achève les Kitsounebis à distance.",
+ givrefoux:"Un pur puzzle de placement : exactement ce que font le Pandawa et le Crâ.",
+ kralamoure:"Les guides recommandent le Pandawa pour placer les tentacules.",
+ ombre:"Le succès consiste à finir Ombre au bon endroit : portage du Pandawa et reculs du Crâ.",
+ razof:"Combat accessible ; le succès spécial protège les poupées du Sadida, à jouer prudemment.",
+ fwetard:"Accessible et rentable, mais seulement pendant l'événement de Nowel.",
+ kao:"Accessible, mais seulement pendant l'événement de l'Île de Pwâk.",
+ "reine-voleurs":"Repousser les Bonbombes bleues est facile avec le Crâ et le Pandawa."};
+
+/* Schémas tactiques : grille isométrique. t = boss | mob | ally | hid (invisible) | ok (case sûre) | bad (case dangereuse) | glyph */
+const TAC={
+ givrefoux:{n:8,title:"Rendre le Tengu vulnérable",marks:[[3,3,"boss","T"],[5,5,"mob","Yk"],[3,6,"mob","Ym"],[1,6,"ally","PA"],[3,7,"ally","FO"],[6,2,"ally","CR"],[4,4,"ok",""],[3,4,"line",""],[3,5,"line",""]],
+  arrows:[[1,6,5,5,"var(--gold)"],[6,2,3,6,"var(--mana)"]],
+  steps:["Le <b>Pandawa</b> porte puis lance le <b>Yokaï</b> en diagonale du Tengu (même écart en colonne et en ligne).","Le <b>Crâ</b> recule le <b>Yomi</b> pour l'aligner avec le Tengu.","Le <b>Forgelance</b> frappe le Yomi <b>avec son arme</b>, toujours dans le même tour.","Au tour du Tengu, il perd l'invulnérabilité pendant 3 tours. S'il manque une étape, n'active pas le Yomi : le Tengu tuerait deux persos."]},
+ koumiho:{n:8,title:"Trouver et tuer les deux Kitsounebis",marks:[[3,3,"boss","K"],[1,1,"hid","?"],[6,5,"hid","?"],[5,5,"zone",""],[6,6,"zone",""],[7,5,"zone",""],[6,4,"zone",""],[5,4,"zone",""],[2,6,"glyph",""],[4,7,"ally","CR"],[2,7,"ally","SA"]],
+  arrows:[[4,7,6,5,"var(--mana)"]],
+  steps:["Dès le tour 2, les Kitsounebis sont invisibles. La <b>Lanterne</b> les révèle dans sa zone.","Marcher sur un <b>glyphe de Kitsounebi</b> échange Koumiho avec lui : tu sais où il était.","Tue les <b>deux Kitsounebis dans le même tour</b>, sinon l'un revient.","Koumiho reste vulnérable pour le reste du combat. Pour le succès spécial, n'utilise pas la Lanterne."]},
+ "pere-ver":{n:7,title:"Frapper le Père Ver",marks:[[3,3,"boss","PV"],[2,3,"ok",""],[4,3,"ok",""],[3,2,"ok",""],[3,4,"ok",""],[1,3,"bad",""],[5,3,"bad",""],[3,1,"bad",""],[3,5,"bad",""],[4,4,"ally","FO"],[6,5,"ally","PA"],[0,6,"ally","CR"]],
+  arrows:[[6,5,4,4,"var(--gold)"]],
+  steps:["Le Père Ver est immobile et <b>insensible à toute attaque à 2 PO ou plus</b> (cases rouges).","Seules les 4 cases au contact (vertes) permettent de le frapper.","Le <b>Pandawa</b> lance le Forgelance au contact dès le premier tour.","Chaque monstre tué te coûte 1 PA, 1 PM et environ 500 PV : tue-les au bon moment."]},
+ kralamoure:{n:9,title:"Retirer les 900 % de résistances",marks:[[4,4,"boss","KG"],[1,2,"mob","1"],[2,7,"mob","2"],[7,6,"mob","3"],[6,1,"mob","4"],[3,0,"ally","PA"],[8,8,"ally","CR"]],
+  arrows:[[1,2,2,7,"var(--gold)"],[2,7,7,6,"var(--gold)"],[7,6,6,1,"var(--gold)"],[6,1,4,4,"var(--blood)"]],
+  steps:["Tous les <b>tentacules</b> doivent lancer leur sort l'un après l'autre, <b>dans le même tour</b>.","Le <b>Pandawa</b> place les tentacules pour que chacun ait sa cible et sa ligne de vue.","Le Kralamoure lance alors « Vulnérabilité de la Tourbière » : −900 % de résistances.","Pendant 2 tours, lui et ses alliés ont +2 PM, +63 PO et +8000 dommages. Frappe fort puis mets-toi hors de leur ligne de vue."]},
+ talkasha:{n:9,title:"Lire les attaques de Tal Kasha",marks:[[1,1,"boss","TK"],[5,4,"mob","R"],[6,5,"ally","FO"],[8,7,"ally","CR"],[5,7,"ok",""],[2,7,"ally","SA"]],
+  arrows:[[1,1,5,4,"var(--blood)"],[5,4,6,5,"var(--blood)"]],
+  steps:["Tal Kasha frappe <b>à travers chaque monstre</b> comme s'il était à sa place (R = relais).","Si plusieurs persos sont exposés, c'est <b>le plus proche du relais</b> qui prend le coup.","Les relais ne bougent pas pendant son tour : lis le danger depuis leur position.","Les dommages de poussée retirent l'état des monstres : lancer du Pandawa ou recul du Crâ contre un obstacle."]},
+ bworker:{n:7,title:"Garder le Bworker à distance",marks:[[3,3,"boss","BW"],[2,3,"bad",""],[4,3,"bad",""],[3,2,"bad",""],[3,4,"bad",""],[6,1,"mob","MB"],[0,6,"ally","CR"],[6,6,"ally","SA"],[1,1,"ally","PA"],[5,2,"ally","FO"]],
+  arrows:[[5,2,6,1,"var(--gold)"]],
+  steps:["Le Bworker frappe à <b>30 % de ses PV</b> au contact (cases rouges) : personne ne doit finir son tour collé à lui.","Tue la <b>Mama Bwork</b> en premier : elle rend tous ses PV à un allié.","Les <b>Cybworks</b> interceptent les dégâts autour d'eux : sors ta cible de leur zone avant de frapper.","Hors succès spécial, reculs et retraits de PM gardent le Bworker loin."]},
+ xlii:{clock:true,title:"Suivre l'Auroraire",
+  steps:["Au début, tout le monde inflige <b>40 %</b> de ses dégâts, monstres compris.","Chaque tour allié, l'Auroraire avance et ajoute <b>+10 %</b> aux deux camps.","Une nouvelle vague arrive tous les 5 tours, ou dès que la précédente est vide.","Tuer XLII fait disparaître l'Auroraire : vise-le pendant que tes dégâts montent."]}
+};
+
+/* Icônes de classe, dessins originaux */
+const CLS={
+ SA:{n:"Sadida",c:"#5fd06b",svg:'<circle cx="16" cy="16" r="15" fill="#173a22"/><path d="M16 5c6 4 8 10 4 17-2 3-6 4-8 4 0-5 1-12 4-21z" fill="#5fd06b"/><path d="M16 7c-2 6-3 12-3 19" stroke="#173a22" stroke-width="1.4" fill="none"/>'},
+ FO:{n:"Forgelance",c:"#ff8a3d",svg:'<circle cx="16" cy="16" r="15" fill="#3d1f0e"/><path d="M8 25L22 11" stroke="#d9c7b0" stroke-width="2.4" stroke-linecap="round"/><path d="M21 6l5 5-6 3-2-2z" fill="#ff8a3d"/><path d="M9 20l3 3" stroke="#ff8a3d" stroke-width="2"/>'},
+ PA:{n:"Pandawa",c:"#c9e0f5",svg:'<circle cx="16" cy="16" r="15" fill="#20283a"/><path d="M13 6h6v3l2 3v12a3 3 0 01-3 3h-4a3 3 0 01-3-3V12l2-3z" fill="#c9e0f5"/><path d="M11 16h10" stroke="#20283a" stroke-width="2"/><rect x="13" y="4" width="6" height="3" rx="1" fill="#9b6b3c"/>'},
+ CR:{n:"Crâ",c:"#52c8ff",svg:'<circle cx="16" cy="16" r="15" fill="#10293a"/><path d="M10 5c8 4 8 18 0 22" fill="none" stroke="#c39a5a" stroke-width="2.2"/><path d="M10 5v22" stroke="#e6edf5" stroke-width=".9"/><path d="M8 16h17" stroke="#52c8ff" stroke-width="1.8"/><path d="M25 16l-4-3v6z" fill="#52c8ff"/>'}
+};
+const ic=(p,s)=>`<svg viewBox="0 0 32 32" aria-hidden="true">${CLS[p].svg}</svg>`;
+const SKULL=f=>`<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c-3.6 0-6 2.4-6 5.6 0 1.9.9 3.2 2 4v2.4h8v-2.4c1.1-.8 2-2.1 2-4 0-3.2-2.4-5.6-6-5.6z" fill="${f?"var(--blood)":"var(--line)"}"/><circle cx="5.7" cy="7.4" r="1.4" fill="var(--panel)"/><circle cx="10.3" cy="7.4" r="1.4" fill="var(--panel)"/><path d="M8 9.3l-.9 1.5h1.8z" fill="var(--panel)"/></svg>`;
+const STAR=f=>`<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l2.1 4.5 4.9.6-3.6 3.4.9 4.9L8 12l-4.3 2.4.9-4.9L1 6.1l4.9-.6z" fill="${f?"var(--gold)":"var(--line)"}"/></svg>`;
+const rep=(fn,n)=>Array.from({length:5},(_,i)=>fn(i<n)).join("");
+
+const ICONS={
+ inv:["Invulnérable","var(--mana)",'<path d="M8 1l6 2v4c0 4-3 6.5-6 8-3-1.5-6-4-6-8V3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 8l2 2 3-4" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ vag:["Vagues","var(--gold)",'<path d="M1 6c2-2 3-2 5 0s3 2 5 0 3-2 4 0M1 11c2-2 3-2 5 0s3 2 5 0 3-2 4 0" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ oneshot:["Coup mortel","var(--blood)",'<circle cx="8" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 6h.01M10 6h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M6 13h4" stroke="currentColor" stroke-width="1.6"/>'],
+ cac:["Contact obligatoire","var(--ok)",'<path d="M3 13l8-8M9 3h4v4" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ place:["Placement","var(--gold)",'<path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ pacif:["Pacifiste","var(--warn)",'<path d="M3 9c0-3 2-5 5-5s5 2 5 5M3 9h10M8 9v5" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ soin:["Sans soin","var(--blood)",'<path d="M8 14S2 10 2 6a3 3 0 016-1 3 3 0 016 1c0 4-6 8-6 8z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 13L13 3" stroke="currentColor" stroke-width="1.6"/>'],
+ invis:["Invisibles","var(--muted)",'<path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><circle cx="8" cy="8" r="2" fill="currentColor"/>'],
+ poison:["Poisons","var(--ok)",'<path d="M8 1c3 4 5 6 5 9a5 5 0 01-10 0c0-3 2-5 5-9z" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
+ ordre:["Ordre de mort","var(--mana)",'<path d="M3 4h10M3 8h7M3 12h4" stroke="currentColor" stroke-width="1.6"/>']
+};
+function stateIcons(d){const t=[d.key,d.sp,...(d.mech||[]),...(d.succ||[]).map(s=>s[1])].join(" ").toLowerCase();const on=[];
+ if(/invuln|résistances/.test(t))on.push("inv");if(/vague/.test(t))on.push("vag");if(/tue deux|tue au contact|tue la cible|75 %|30 % de ses pv/.test(t))on.push("oneshot");
+ if(/2 po ou plus|aller au corps/.test(t))on.push("cac");
+ if(/diagonale|aligné|en ligne|placer|placement/.test(t))on.push("place");if(/pacifiste/.test(t))on.push("pacif");
+ if(/recevoir de soin|soignés par/.test(t))on.push("soin");if(/invisible/.test(t))on.push("invis");if(/poison/.test(t))on.push("poison");
+ if(/en premier|en dernier|en première|avant la mort/.test(t))on.push("ordre");
+ return on.map(x=>{const [n,c,p]=ICONS[x];return `<span class="chip"><svg viewBox="0 0 16 16" style="color:${c}" aria-hidden="true">${p}</svg>${n}</span>`}).join("");}
+
+function crest(l){const col=l>=200?"var(--blood)":l>=190?"var(--warn)":l>=180?"var(--gold)":"var(--ok)";
+ return `<svg class="crest" viewBox="0 0 100 100" role="img" aria-label="Niveau ${l}"><path d="M50 3l40 15v30c0 26-18 41-40 49C28 89 10 74 10 48V18z" fill="var(--bg2)" stroke="${col}" stroke-width="3"/><path d="M50 13l31 11v24c0 20-14 32-31 38-17-6-31-18-31-38V24z" fill="none" stroke="var(--line)" stroke-width="1.5"/><path d="M28 30l22-8 22 8" fill="none" stroke="${col}" stroke-width="2"/><text x="50" y="62" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="28" fill="var(--fg)">${l}</text><text x="50" y="77" text-anchor="middle" font-family="Exo 2, sans-serif" font-size="8.5" font-weight="800" letter-spacing="2.5" fill="${col}">NIVEAU</text></svg>`;}
+
+/* Grille isométrique : colonnes et lignes du jeu apparaissent en diagonale à l'écran, comme dans Dofus */
+function board(t){
+ if(t.clock){let s='<svg class="board" viewBox="0 0 360 200" role="img" aria-label="Évolution des dégâts avec l\'Auroraire">';
+  for(let i=0;i<10;i++){const v=40+i*10,h=v*1.2,x=24+i*33;s+=`<rect x="${x}" y="${170-h}" width="24" height="${h}" rx="2" fill="${v>=100?"var(--blood)":"var(--mana)"}" opacity="${.45+i*.055}"/><text x="${x+12}" y="186" text-anchor="middle" font-size="10" fill="var(--muted)">T${i+1}</text><text x="${x+12}" y="${164-h}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--fg)">${v}%</text>`;}
+  s+=`<line x1="18" y1="50" x2="350" y2="50" stroke="var(--gold)" stroke-dasharray="4 3"/><text x="350" y="44" text-anchor="end" font-size="10" fill="var(--gold)">100 % des dégâts normaux</text></svg>`;return s;}
+ const n=t.n,tw=40,th=20,W=n*tw+20,H=n*th+40,ox=W/2,oy=20;
+ const P=(c,r)=>[ox+(c-r)*tw/2,oy+(c+r)*th/2+th/2];
+ const kind={};t.marks.forEach(m=>kind[m[0]+","+m[1]]=m[2]);
+ let s=`<svg class="board" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.title}"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5 0 10z" fill="context-stroke"/></marker></defs>`;
+ for(let r=0;r<n;r++)for(let c=0;c<n;c++){const [x,y]=P(c,r),k=kind[c+","+r];
+  const fill=k==="ok"?"color-mix(in srgb,var(--ok) 45%,var(--panel))":k==="bad"?"color-mix(in srgb,var(--blood) 40%,var(--panel))":k==="zone"?"color-mix(in srgb,var(--mana) 35%,var(--panel))":k==="line"?"color-mix(in srgb,var(--gold) 30%,var(--panel))":k==="glyph"?"color-mix(in srgb,#b06bff 45%,var(--panel))":((c+r)%2?"var(--panel2)":"var(--bg2)");
+  s+=`<path d="M${x} ${y-th/2}L${x+tw/2} ${y}L${x} ${y+th/2}L${x-tw/2} ${y}Z" fill="${fill}" stroke="var(--line)" stroke-width=".8"/>`;}
+ (t.arrows||[]).forEach(([c1,r1,c2,r2,col])=>{const [a,b]=P(c1,r1),[x,y]=P(c2,r2);const dx=x-a,dy=y-b,L=Math.hypot(dx,dy),k=(L-12)/L;
+  s+=`<path d="M${a} ${b-6}Q${(a+x)/2} ${Math.min(b,y)-24} ${a+dx*k} ${b-6+dy*k}" fill="none" stroke="${col}" stroke-width="2.4" stroke-dasharray="5 3" marker-end="url(#ah)"/>`;});
+ t.marks.forEach(([c,r,k,l])=>{if(!["boss","mob","ally","hid"].includes(k))return;const [x,y]=P(c,r);
+  const col=k==="boss"?"var(--blood)":k==="mob"?"var(--warn)":k==="hid"?"var(--muted)":(CLS[l]?CLS[l].c:"var(--mana)");
+  const R=k==="boss"?13:10;
+  s+=`<ellipse cx="${x}" cy="${y+3}" rx="${R}" ry="${R/2.4}" fill="#000" opacity=".35"/>`;
+  if(k==="ally"&&CLS[l]) s+=`<g transform="translate(${x-12} ${y-22}) scale(.75)">${CLS[l].svg}</g>`;
+  else s+=`<circle cx="${x}" cy="${y-8}" r="${R}" fill="${k==="hid"?"none":col}" stroke="${k==="hid"?col:"var(--bg)"}" stroke-width="${k==="hid"?2:1.5}" ${k==="hid"?'stroke-dasharray="3 2"':""}/><text x="${x}" y="${y-4.5}" text-anchor="middle" font-size="${k==="boss"?10:9}" font-weight="800" fill="${k==="hid"?col:"var(--bg)"}">${l}</text>`;});
+ return s+"</svg>";}
+const LEG='<div class="legend"><span><i style="background:var(--blood)"></i>Boss</span><span><i style="background:var(--warn)"></i>Monstre</span><span><i style="background:color-mix(in srgb,var(--ok) 45%,var(--panel))"></i>Case sûre / utile</span><span><i style="background:color-mix(in srgb,var(--blood) 40%,var(--panel))"></i>Case dangereuse</span><span><i style="background:color-mix(in srgb,var(--mana) 35%,var(--panel))"></i>Zone de sort</span><span><i style="background:color-mix(in srgb,#b06bff 45%,var(--panel))"></i>Glyphe</span><span><i style="background:color-mix(in srgb,var(--gold) 30%,var(--panel))"></i>Ligne</span></div>';
+
+const PCS=["SA","FO","PA","CR"];
+const STD=[["Vaincre","Terminer le donjon."],["Duo","Le vaincre avec 2 personnages maximum."]];
+function succOf(d){return d.succ||[...STD.map(([t,c])=>[t+(t==="Vaincre"?" "+d.b:""),c]),["Succès spécial",d.sp,1]];}
+let S={};try{S=JSON.parse(localStorage.getItem("codex170")||"{}")}catch(e){}
+function save(){try{localStorage.setItem("codex170",JSON.stringify(S))}catch(e){}}
+const K=(d,i,p)=>d.id+"|"+i+"|"+p;
+let band="all",q="",sort="lvl",cur=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+
+$("#team").innerHTML=PCS.map(p=>`<span class="hero-pc">${ic(p)}${CLS[p].n}</span>`).join("");
+$("#bands").innerHTML=["all",170,180,190,200].map(b=>`<button class="f" data-b="${b}" aria-pressed="${b==="all"}">${b==="all"?"Tous":b}</button>`).join("");
+
+function doneCount(d){const n=succOf(d).length;let c=0;for(let i=0;i<n;i++)if(PCS.every(p=>S[K(d,i,p)]))c++;return [c,n];}
+function renderList(){
+ const L=$("#list");let items=D.filter(d=>(band==="all"||String(d.lvl)===band)&&(!q||norm(d.b+" "+d.dj).includes(norm(q))));
+ if(sort==="diff")items=[...items].sort((a,b)=>RATE[a.id][0]-RATE[b.id][0]||a.lvl-b.lvl);
+ let h="",last=null;
+ items.forEach(d=>{const g=sort==="diff"?RATE[d.id][0]+" crâne"+(RATE[d.id][0]>1?"s":""):"Niveau "+d.lvl;
+  if(g!==last){h+=`<li class="grp">${g}</li>`;last=g;}
+  const [c,n]=doneCount(d);
+  h+=`<li><button class="it ${cur===d.id?"on":""}" data-id="${d.id}"><span class="lv">${d.lvl}</span><span class="nm">${esc(d.b)}</span><span class="done ${c===n?"full":""}" title="Succès validés par les 4 persos">${c}/${n}</span><span class="sk" aria-label="Difficulté ${RATE[d.id][0]} sur 5">${rep(SKULL,RATE[d.id][0])}</span></button></li>`;});
+ L.innerHTML=h||'<li class="empty">Aucun donjon ne correspond. Essaie un autre nom ou le filtre « Tous ».</li>';
+ let all=0,done=0;D.forEach(d=>{const n=succOf(d).length;all+=n*4;for(let i=0;i<n;i++)PCS.forEach(p=>{if(S[K(d,i,p)])done++})});
+ $("#pDone").textContent=done;$("#pAll").textContent=all;$("#pBar").style.width=(all?done/all*100:0)+"%";
+}
+function renderSheet(id){
+ const d=D.find(x=>x.id===id)||D[0];cur=d.id;const sc=succOf(d),[df,fit]=RATE[d.id],t=TAC[d.id];
+ $("#sheet").innerHTML=`
+ <div class="boss hud">${crest(d.lvl)}
+  <div class="meta">
+   <div class="eb"><span>${esc(d.dj)}</span><span>${esc(d.pos)}</span></div>
+   <h2>${esc(d.b)}</h2>
+   <div class="rating"><span>Difficulté ${rep(SKULL,df)}</span><span>Pour ta team ${rep(STAR,fit)}</span></div>
+   <div class="chips">${stateIcons(d)}${d.v?'<span class="chip v">Fiche détaillée</span>':'<span class="chip p">Fiche courte</span>'}</div>
+   <div class="links"><a class="btn" href="https://www.dofus.com/fr/mmorpg/encyclopedie/monstres?text=${encodeURIComponent(d.b.split(" & ")[0])}" target="_blank" rel="noopener">Voir le boss ↗</a><a class="btn alt" href="${d.url}" target="_blank" rel="noopener">Guide complet ↗</a></div>
+  </div></div>
+ ${d.key?`<div class="alert hud"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 13H1z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 6v4M8 12v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><div><h3>Mécanique clé</h3><p>${d.key}</p></div></div>`:""}
+ ${t?`<section class="p hud"><h3>${svgI('<path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/>')}${t.title}</h3><div class="tactic"><div>${board(t)}${t.clock?"":LEG}</div><ol class="steps">${t.steps.map(s=>`<li><span>${s}</span></li>`).join("")}</ol></div></section>`:""}
+ <div class="grid2">
+  ${d.mech?`<section class="p hud"><h3>${svgI('<path d="M8 1l6 2v4c0 4-3 6.5-6 8-3-1.5-6-4-6-8V3z" fill="none" stroke="currentColor" stroke-width="1.6"/>')}Mécaniques du boss</h3><ul>${d.mech.map(m=>`<li>${m}</li>`).join("")}</ul></section>`:""}
+  ${d.mobs?`<section class="p hud"><h3>${svgI('<circle cx="8" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 13h4" stroke="currentColor" stroke-width="1.6"/>')}Monstres à surveiller</h3><ul>${d.mobs.map(m=>`<li>${m}</li>`).join("")}</ul></section>`:""}
+  <section class="p hud"><h3>${svgI('<circle cx="5" cy="5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1 14c0-3 2-5 4-5s4 2 4 5M7 14c0-3 2-5 4-5s4 2 4 5" fill="none" stroke="currentColor" stroke-width="1.5"/>')}Plan pour ta team</h3>
+   <div class="cls">${PCS.map(p=>`<div class="cl">${ic(p)}<div><b>${CLS[p].n}</b>${esc(d.team[p])}</div></div>`).join("")}</div></section>
+  <section class="p hud"><h3>${svgI('<path d="M4 2h8v4a4 4 0 01-8 0zM6 10l-1 4h6l-1-4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 3H1c0 3 1 4 3 4M12 3h3c0 3-1 4-3 4" fill="none" stroke="currentColor" stroke-width="1.5"/>')}Succès</h3>
+   <div class="succ">${sc.map(([tt,c,sp],i)=>{const all=PCS.every(p=>S[K(d,i,p)]);return `
+    <div class="s ${all?"all":""}"><div><div class="t">${esc(tt)}${sp?'<span class="sp">Challenge</span>':""}</div><div class="c">${esc(c)}</div></div>
+    <div class="chk" role="group" aria-label="Validé par">${PCS.map(p=>`<button data-k="${K(d,i,p)}" aria-pressed="${!!S[K(d,i,p)]}" title="${CLS[p].n}" aria-label="${CLS[p].n}">${ic(p)}</button>`).join("")}</div></div>`}).join("")}</div>
+   ${d.v?"":'<p class="note">Les succès Premier, Dernier, Statue, Zombie ou Focus varient selon le boss : vérifie la liste exacte dans l\'onglet Succès du jeu.</p>'}
+  </section>
+ </div>`;
+ renderList();
+ if(location.hash.slice(1)!==d.id)history.replaceState(null,"","#"+d.id);
+}
+const svgI=p=>`<svg viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
+
+function renderTop(){
+ const list=D.filter(d=>RATE[d.id][1]>=4).sort((a,b)=>RATE[b.id][1]-RATE[a.id][1]||RATE[a.id][0]-RATE[b.id][0]||a.lvl-b.lvl);
+ $("#topgrid").innerHTML=list.map((d,i)=>`<button class="card hud" data-id="${d.id}"><span class="rk">#${i+1}</span><h4>${esc(d.b)}</h4>
+  <div class="rating"><span>${rep(STAR,RATE[d.id][1])}</span><span>${rep(SKULL,RATE[d.id][0])}</span></div>
+  <p>${esc(WHY[d.id]||"")}</p><span class="ok ${d.lvl>190?"later":""}">Niveau ${d.lvl} · ${d.lvl<=190?"faisable dès maintenant":"pour ton passage 200"}</span></button>`).join("");
+}
+function view(v){const top=v==="top";$("#vBest").hidden=top;$("#vTop").hidden=!top;$("#tBest").setAttribute("aria-selected",!top);$("#tTop").setAttribute("aria-selected",top);if(top){renderTop();history.replaceState(null,"","#top");}else renderSheet(cur||"koumiho");}
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>view(b.dataset.v)));
+$("#list").addEventListener("click",e=>{const b=e.target.closest("button[data-id]");if(b){renderSheet(b.dataset.id);if(innerWidth<=920)$("#sheet").scrollIntoView({behavior:"smooth"});}});
+$("#topgrid").addEventListener("click",e=>{const b=e.target.closest("button[data-id]");if(b){cur=b.dataset.id;view("best");scrollTo({top:0});}});
+$("#sheet").addEventListener("click",e=>{const b=e.target.closest("button[data-k]");if(!b)return;const k=b.dataset.k;if(S[k])delete S[k];else S[k]=1;save();renderSheet(cur);});
+$("#bands").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;band=b.dataset.b;$("#bands").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList();});
+document.querySelectorAll("[data-sort]").forEach(b=>b.addEventListener("click",()=>{sort=b.dataset.sort;document.querySelectorAll("[data-sort]").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList();}));
+$("#q").addEventListener("input",e=>{q=e.target.value;renderList();});
+function route(){const h=location.hash.slice(1);if(h==="top")view("top");else{cur=D.some(d=>d.id===h)?h:(cur||"koumiho");view("best");}}
+addEventListener("hashchange",route);route();
+</script>
+
+</body>
+</html>
